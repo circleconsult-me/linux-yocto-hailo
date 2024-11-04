@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-2.0
+
+config DRM_HAILO
+	tristate "HAILO Display"
+	depends on DRM
+	select DRM_KMS_HELPER
+	select DRM_KMS_CMA_HELPER
+	help
+	  This is a DRM display driver for HAILO Displays or display
+	  adapters.
+
+	  If M is selected the module will be called hailo.

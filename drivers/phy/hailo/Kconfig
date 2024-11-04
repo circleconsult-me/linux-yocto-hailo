@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Phy drivers for Hailo platforms
+#
+
+config PHY_HAILO_TORRENT
+	tristate "Hailo15 Cadence Torrent Multi-Protocol PHY support"
+	depends on OF && ARCH_HAILO15 || COMPILE_TEST
+	depends on OF_ADDRESS
+	depends on COMMON_CLK
+	default PHY_CADENCE_TORRENT
+	help
+	  This option enables support for the Cadence Torrent Multi-Protocol PHY wrapper
+	  found on Hailo15 SoC, used for PCIe and USB3.

@@ -1,0 +1,137 @@
+// SPDX-License-Identifier:     GPL-2.0
+/*
+ * Copyright (c) 2019-2024 Hailo Technologies Ltd. All rights reserved.
+ */
+
+/dts-v1/;
+#include "hailo15l-base.dtsi"
+
+/ {
+    memory {
+        device_type = "memory";
+        reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
+    };
+};
+
+&pinctrl {
+    pinctrl_eth_tx_clk: eth_tx_clk {
+        function = "eth_tx_clk_out";
+        groups = "eth_tx_clk_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_eth_tx_ctl_en: eth_tx_ctl_en {
+        function = "eth_tx_ctl_en_out";
+        groups = "eth_tx_ctl_en_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_eth_txd_0: eth_txd_0 {
+        function = "eth_txd_0_out";
+        groups = "eth_txd_0_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_eth_txd_1: eth_txd_1 {
+        function = "eth_txd_1_out";
+        groups = "eth_txd_1_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_eth_txd_2: eth_txd_2 {
+        function = "eth_txd_2_out";
+        groups = "eth_txd_2_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_eth_txd_3: eth_txd_3 {
+        function = "eth_txd_3_out";
+        groups = "eth_txd_3_out_grp";
+        drive-strength = <2>;
+    };
+
+    pinctrl_uart0_rxd: uart0_rxd {
+        function = "uart0_rxd_in";
+        groups = "uart0_rxd_in_0_grp";
+    };
+
+    pinctrl_uart0_txd: uart0_txd {
+        function = "uart0_txd_out";
+        groups = "uart0_txd_out_0_grp";
+    };
+
+    pinctrl_uart1_rxd: uart1_rxd {
+        function = "uart1_rxd_in";
+        groups = "uart1_rxd_in_0_grp";
+    };
+
+    pinctrl_uart1_txd: uart1_txd {
+        function = "uart1_txd_out";
+        groups = "uart1_txd_out_0_grp";
+    };
+};
+
+&eth {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_eth_tx_clk>,
+                <&pinctrl_eth_tx_ctl_en>,
+                <&pinctrl_eth_txd_0>,
+                <&pinctrl_eth_txd_1>,
+                <&pinctrl_eth_txd_2>,
+                <&pinctrl_eth_txd_3>;
+};
+
+&serial0 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_uart0_txd>, <&pinctrl_uart0_rxd>;
+};
+
+&serial1 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_uart1_txd>, <&pinctrl_uart1_rxd>;
+};
+
+&sdio0_reserved {
+    status = "okay";
+};
+&sdio0 {
+    status = "okay";
+    sdhci-caps = <0 0x01000000>; // Force VOLT33 capability
+    bus-width = <4>;
+
+    phy-config {
+            card-is-emmc = <0x0>;
+            cmd-pad-values = <0x1 0x3 0x1 0x1>; // txslew_ctrl_n, txslew_ctrl_p, weakpull_enable, rxsel
+            dat-pad-values = <0x1 0x3 0x1 0x1>; // txslew_ctrl_n, txslew_ctrl_p, weakpull_enable, rxsel
+            rst-pad-values = <0x1 0x3 0x1 0x1>; // txslew_ctrl_n, txslew_ctrl_p, weakpull_enable, rxsel
+            clk-pad-values = <0x1 0x3 0x0 0x1>; // txslew_ctrl_n, txslew_ctrl_p, weakpull_enable, rxsel
+            sdclkdl-cnfg = <0x1 0x7F>; //extdly_en, cckdl_dc
+            drive-strength = <0x9 0x8>; //pad_sp, pad_sn
+    };
+};
+
+&gp_vdma {
+    status = "disabled";
+};
+
+&xspi {
+    status = "okay";
+
+    spi0_flash0: flash@0 {
+        /* values for MT25QU01G */
+        spi-max-frequency = <6250000>; /* 90Mhz in DTR, 166Mhz in STR */
+        cdns,read-delay = <7>;
+        cdns,tshsl-ns = <30>;
+        cdns,tsd2d-ns = <30>;
+        cdns,tchsh-ns = <5>;
+        cdns,tslch-ns = <3>;
+    };
+};
+
+
+/delete-node/ &cpu_1;
+/delete-node/ &cpu_2;
+/delete-node/ &cpu_3;

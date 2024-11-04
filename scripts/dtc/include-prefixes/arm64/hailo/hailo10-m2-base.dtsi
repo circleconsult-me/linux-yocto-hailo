@@ -1,0 +1,80 @@
+// SPDX-License-Identifier:     GPL-2.0
+/*
+ * Copyright (c) 2019-2024 Hailo Technologies Ltd. All rights reserved.
+ */
+
+#include "hailo10-base.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+    memory {
+        device_type = "memory";
+        reg = <0x00000000 0x80000000 0x00000002 0x00000000>;
+    };
+};
+
+&i2c_1 {
+    status = "ok";
+    ina231_3v3_pci: 3v3_pci@40 {
+        status = "disabled";
+        compatible = "ti,ina231_precise";
+        reg = <0x40>;
+        shunt-resistor = <10000>;
+        max-current = <2500>;
+    };
+
+    regulator_0p8v: regulator-0p8v@43 {
+        status = "disabled";
+        compatible = "ti,tps62872";
+        reg = <0x43>;
+        regulator-name = "+0.8V";
+        regulator-min-microvolt = <400000>;
+        regulator-max-microvolt = <1037500>;
+        regulator-initial-mode = <2>;
+    };
+
+    /* 64 KiB EEPROM  */
+    eeprom: eeprom-atmel-24cs64@50 {
+        status = "disabled";
+        compatible = "atmel,24cs64";
+        reg = <0x30>;
+    };
+};
+
+&reserved_memory {
+    /* set Linux,CMA area to 1 GiB */
+    cma: linux,cma {
+        size = <0x0 0x40000000>;
+        alloc-ranges = <0x0 0x86000000 0x0 0x40000000>;
+    };
+    hailo_media_buf_cma: hailo_media_buf,cma {
+        status = "disabled";
+    };
+};
+
+#define GPIO_LINE_NAMES \
+    "gpio_in_out_0",            "gpio_in_out_1",        "gpio_in_out_2",            "gpio_in_out_3", \
+    "gpio_in_out_4",            "boot_rom_led",         "gpio_in_out_6",            "gpio_in_out_7", \
+    "gpio_in_out_8",            "sdio1_reset",          "rmii_rst_n",               "gpio_in_out_11", \
+    "gpio_in_out_12",           "gpio_in_out_13",       "gpio_in_out_14",           "gpio_in_out_15", \
+    \
+    "gpio_in_out_16",           "gpio_in_out_17",       "gpio_in_out_18",           "ina_alert_n", \
+    "gpio_in_out_20",           "gpio_in_out_21",       "gpio_in_out_22",           "gpio_in_out_23", \
+    "gpio_in_out_24",           "gpio_in_out_25",       "gpio_in_out_26",           "gpio_in_out_27", \
+    "gpio_in_out_28",           "gpio_in_out_29",       "gpio_in_out_30",           "gpio_in_out_31"
+
+&gpio0 {
+    gpio-ranges = <&pinctrl 0 0 16>;
+
+    gpio-line-names = GPIO_LINE_NAMES;
+};
+
+&gpio1 {
+    gpio-ranges = <&pinctrl 0 16 16>;
+
+    gpio-line-names = GPIO_LINE_NAMES;
+};
+
+&hailo_pci_ep_driver {
+    status = "okay";
+};

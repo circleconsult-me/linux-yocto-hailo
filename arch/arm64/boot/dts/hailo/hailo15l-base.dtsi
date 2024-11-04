@@ -1,0 +1,207 @@
+// SPDX-License-Identifier:     GPL-2.0
+/*
+ * Copyright (c) 2019-2024 Hailo Technologies Ltd. All rights reserved.
+ */
+
+#define HAILO_SOC_TYPE HAILO_SOC_HAILO15L
+#include "hailo15-family-base.dtsi"
+
+/ {
+    memory {
+        device_type = "memory";
+        reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
+    };
+
+    soc {
+        compatible = "hailo,hailo15l";
+    };
+
+    pl320_mailbox: mailbox {
+        reg = <0 0x78003000 0 0x1000>;
+    };
+
+    pinctrl: pinctrl@7c291000 {
+        compatible = "hailo15l,pinctrl";
+        reg = <0 0x7c291000 0 0x1000>,
+                <0 0x7c292000 0 0x1000>,
+                <0 0x7c293000 0 0x1000>;
+        reg-names = "general_pads_config_base", "gpio_pads_config_base", "slow_pads_config_base";
+    };
+
+    vision_subsys: vision_subsys {
+        csi2rx1: csi-bridge@7c015000 {
+            power-domains = <&scmi_devpd HAILO15_SCMI_POWER_DOMAIN_IDX_CSI_RX0>;
+        };
+    };
+
+    spi_0: spi_0@0x00115000 {
+        status = "disabled";
+        compatible = "snps,dw-apb-ssi";
+        reg = <0 0x00115000 0 0x400>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__SPI0_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_SPI_0_GATE>;
+        clock-names = "spi_0_gate";
+        num-cs = <4>;
+    };
+    spi_1: spi_1@0x00115400 {
+        status = "disabled";
+        compatible = "snps,dw-apb-ssi";
+        reg = <0 0x00115400 0 0x400>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__SPI1_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_SPI_1_GATE>;
+        clock-names = "spi_1_gate";
+        num-cs = <2>;
+	};
+    spi_2: spi_2@0x00115800 {
+        status = "disabled";
+        compatible = "snps,dw-apb-ssi";
+        reg = <0 0x00115800 0 0x400>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__SPI2_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_SPI_2_GATE>;
+        clock-names = "spi_2_gate";
+        num-cs = <2>;
+	};
+    spi_3: spi_3@0x00115c00 {
+        status = "disabled";
+        compatible = "snps,dw-apb-ssi";
+        reg = <0 0x00115c00 0 0x400>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__SPI3_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_SPI_3_GATE>;
+        clock-names = "spi_3_gate";
+        num-cs = <1>;
+	};
+
+    xspi: xspi@1c0000 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "hailo,xspi-nor";
+        reg = <0x00000000 0x001c0000 0x00000000 0x2000>,
+                <0x00000000 0x70000000 0x00000000 0x08000000>,
+                <0x0 0x001c2000 0x0 0x1000>,
+                <0x0 0x0010f000 0x0 0x1000>;
+        reg-names = "io", "sdma", "aux", "wrapper";
+        interrupts = <GIC_SPI HW_INTERRUPTS__XSPI_IRQ IRQ_TYPE_LEVEL_HIGH>;
+
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_HCLK>;
+
+        status = "disabled";
+
+        spi0_flash0: flash@0 {
+            #address-cells = <1>;
+            #size-cells = <1>;
+            compatible = "jedec,spi-nor";
+            reg = <0>; /* chip select */
+        };
+    };
+
+    /* @todo : Need to replace with fractional devider (temporary used. ) */
+    hailo_i2s_fractional_divider_clock: hailo_i2s_fractional_divider_clock {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <1536000>;
+    };
+
+    i2s_0_cpu: audio-controller-0@10d000 {
+        compatible = "snps,designware-i2s";
+        reg = <0x0 0x10d000 0x0 0x400>;
+        #sound-dai-cells = <0>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__I2S0_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        interrupt-names = "i2s_0_irq";
+        status = "disabled";
+    };
+
+    i2s_1_cpu: audio-controller-1@10d400 {
+        compatible = "snps,designware-i2s";
+        reg = <0x0 0x10d400 0x0 0x400>;
+        #sound-dai-cells = <0>;
+        interrupts = <GIC_SPI HW_INTERRUPTS__I2S1_IRQ IRQ_TYPE_LEVEL_HIGH>;
+        interrupt-names = "i2s_1_irq";
+        status = "disabled";
+    };
+
+    audio_card_0: audio-card-0{
+        compatible = "simple-audio-card";
+        simple-audio-card,name = "Hailo15l-Audio-master-0";
+        simple-audio-card,format = "i2s";
+        status = "disabled";
+    };
+
+    audio_card_1: audio-card-1{
+        compatible = "simple-audio-card";
+        simple-audio-card,name = "Hailo15l-Audio-master-1";
+        simple-audio-card,format = "i2s";
+        status = "disabled";
+    };
+
+    i2c_0: i2c@104000 {
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_I2C_0>;
+    };
+
+    i2c_1: i2c@105000 {
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_I2C_1>;
+    };
+
+    i2c_2: i2c@106000 {
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_I2C_2>;
+    };
+
+    i2c_3: i2c@107000 {
+        clocks = <&scmi_clk HAILO15_SCMI_CLOCK_IDX_I2C_3>;
+    };
+};
+
+&gp_vdma {
+    status = "disabled";
+};
+
+&integrated_nnc {
+    compatible = "hailo,integrated-nnc,hailo15l";
+    vdma0: vdma@0 {
+        reg = <0x7c050000 0x800>, <0x7c052000 0x2000>;
+        reg-names = "channel-regs", "engine-regs";
+        interrupts = <GIC_SPI HW_INTERRUPTS__DRAM_DMA_AP0_INT_IRQ IRQ_TYPE_LEVEL_HIGH>;
+    };
+
+    vdma1: vdma@1 {
+        reg = <0x7c054000 0x800>, <0x7c056000 0x2000>;
+        reg-names = "channel-regs", "engine-regs";
+        interrupts = <GIC_SPI HW_INTERRUPTS__DRAM_DMA_AP1_INT_IRQ IRQ_TYPE_LEVEL_HIGH>;
+    };
+};
+
+&xrp {
+    status = "okay";
+    compatible = "hailo,hailo15l-dsp";
+    reg = <0 0x7c040000 0 0x2000>; // dsp config + dsp config axi
+    clock-frequency = <750000000>;
+};
+
+&xrp_reserved {
+    status = "okay";
+};
+
+&sdio0 {
+    compatible = "hailo,h15l-dwcmshc-sdhci-0";
+};
+
+&sdio1 {
+    compatible = "hailo,h15l-dwcmshc-sdhci-1";
+};
+
+&gpio0 {
+    reg = <0 0x78200000 0 0x1000>,
+          <0 0x7c2a10e4 0 0xC>;
+};
+
+&gpio1 {
+    reg = <0 0x78201000 0 0x1000>,
+          <0 0x7c2a10e4 0 0xC>;
+};
